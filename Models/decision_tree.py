@@ -163,7 +163,10 @@ class DecisionTree():
                         T = T.branches[1]
                     else:
                         T = T.branches[0]
-            targets.append(T.value)
+            if isinstance(T.value, int):
+                targets.append(T.value)
+            else:
+                targets.append(T.value[0])
 
         targets = np.asarray(targets)
 
