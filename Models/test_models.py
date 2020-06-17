@@ -17,7 +17,7 @@ targets = data[:, -1]
 model = sys.argv[2]
 
 if model == "decision_tree":
-    tree = DecisionTree(attribute_names)
+    tree = DecisionTree(df[1,:])
     tree.fit(trainf, traint)
     num_nodes, max_depth = tree.tree_attributes(tree.tree)
     t = tree.predict(testf)
