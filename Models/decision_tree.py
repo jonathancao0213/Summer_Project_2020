@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import statistics
+from scipy import stats
 
 class Tree():
     def __init__(self, value=None, attribute_name="root", attribute_index=None, branches=None):
@@ -89,7 +90,7 @@ class DecisionTree():
             T = Tree(0)
             return T
         elif len(attributes) == 0:
-            T = Tree(statistics.mode(targets))
+            T = Tree(stats.mode(targets.flatten()))
             return T
         else:
             max = 0
@@ -118,7 +119,7 @@ class DecisionTree():
                 new_features = np.delete(new_features, i, axis = 1)
                 new_attributes = list.copy(attributes)
                 new_attributes.remove(attributes[i])
-                subtree = self.DTL(new_features, new_targets, new_attributes, statistics.mode(new_targets), value)
+                subtree = self.DTL(new_features, new_targets, new_attributes, stats.mode(new_targets.flatten()), value)
 
                 T.branches.append(subtree)
             return T
@@ -135,7 +136,7 @@ class DecisionTree():
         """
         self._check_input(features)
 
-        self.tree = self.DTL(features, targets, self.attribute_names, statistics.mode(targets), None)
+        self.tree = self.DTL(features, targets, self.attribute_names, stats.mode(targets.flatten()), None)
 
     def predict(self, features):
         """
