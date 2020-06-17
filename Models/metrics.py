@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 def load_data(data_path):
     """
@@ -93,7 +94,14 @@ def train_test_split(features, targets, fraction):
         train_targets = targets
         test_features = train_features
         test_targets = train_targets
-        return train_features, train_targets, test_features, test_targets
+    else:
+        f = math.floor(fraction*len(features))
+        train_features = features[:f,:]
+        train_targets = targets[:f]
+        test_features = features[f:,:]
+        test_targets = targets[f:]
+
+    return train_features, train_targets, test_features, test_targets
 
 def confusion_matrix(actual, predictions):
     """
