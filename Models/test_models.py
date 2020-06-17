@@ -6,7 +6,10 @@ import metrics
 # Decision Tree and Prior Probability (hw 1)
 from decision_tree import DecisionTree
 from prior_probability import PriorProbability
+# K Nearest Neighbor (hw2)
 from knn import KNearestNeighbor
+# K Means clustering (hw 5)
+from kmeans import KMeans
 
 data = sys.argv[1]
 
@@ -73,7 +76,22 @@ elif model == "linear_regression":
 elif model == "gradient_descent":
     raise NotImplementError()
 
-elif model == "clustering":
+elif model == "kmeans":
+    m = KMeans(2)
+    m.fit(trainf)
+    labels = m.predict(testf)
+    #acc = metrics.adjusted_mutual_info(testt.flatten(), labels)
+    print(np.subtract(labels,testt.flatten()))
+
+    cm = metrics.confusion_matrix(testt.flatten(), labels)
+    a = metrics.accuracy(testt.flatten(), labels)
+    p, r = metrics.precision_and_recall(testt.flatten(), labels)
+    f = metrics.f1_measure(testt.flatten(), labels)
+    print("Accuracy = %f\n" % a)
+    print("Precision = %f, Recall = %f\n" % (p,r))
+    print("F1 measure = %f\n" % f)
+
+elif model == "gmm":
     raise NotImplementError()
 
 elif model == "reinforcement":
