@@ -8,13 +8,13 @@ from decision_tree import DecisionTree
 from prior_probability import PriorProbability
 # from k_nearest_neighbor import KNearestNeighbor
 
-data = sys.argv[0]
+data = sys.argv[1]
 df = genfromtxt("Data/" + data, delimiter=',')
 data = df[1:, 1:]
 features = data[:,:-1]
 targets = data[:, -1]
 
-model = sys.argv[1]
+model = sys.argv[2]
 
 if model == "decision_tree":
     tree = DecisionTree(attribute_names)
