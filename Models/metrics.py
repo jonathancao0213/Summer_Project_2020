@@ -228,3 +228,106 @@ def f1_measure(actual, predictions):
     precision, recall = precision_and_recall(actual,predictions)
 
     return 2 * precision * recall / (precision + recall)
+
+def euclidean_distances(X, Y):
+    """Compute pairwise Euclidean distance between the rows of two matrices X (shape MxK)
+    and Y (shape NxK). The output of this function is a matrix of shape MxN containing
+    the Euclidean distance between two rows.
+
+    Arguments:
+        X {np.ndarray} -- First matrix, containing M examples with K features each.
+        Y {np.ndarray} -- Second matrix, containing N examples with K features each.
+
+    Returns:
+        D {np.ndarray}: MxN matrix with Euclidean distances between rows of X and rows of Y.
+    """
+
+    M = len(X)
+    if Y.ndim == 1:
+        N = 1
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            D[m] = np.linalg.norm(X[m] - Y)
+    else:
+        N = len(Y)
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            for n in range(0,N):
+                D[m,n] = np.linalg.norm(X[m] - Y[n])
+
+    return D
+
+def manhattan_distances(X, Y):
+    """Compute pairwise Manhattan distance between the rows of two matrices X (shape MxK)
+    and Y (shape NxK). The output of this function is a matrix of shape MxN containing
+    the Manhattan distance between two rows.
+
+    Arguments:
+        X {np.ndarray} -- First matrix, containing M examples with K features each.
+        Y {np.ndarray} -- Second matrix, containing N examples with K features each.
+
+    Returns:
+        D {np.ndarray}: MxN matrix with Manhattan distances between rows of X and rows of Y.
+    """
+
+    M = len(X)
+    if Y.ndim == 1:
+        N = 1
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            s = np.sum(np.absolute(X[m] - Y))
+            D[m] = s
+    else:
+        N = len(Y)
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            for n in range(0,N):
+                s = np.sum(np.absolute(X[m] - Y[n]))
+                D[m,n] = s
+
+    return D
+
+def cosine_distances(X, Y):
+    """Compute Cosine distance between the rows of two matrices X (shape MxK)
+    and Y (shape NxK). The output of this function is a matrix of shape MxN containing
+    the Cosine distance between two rows.
+
+    Arguments:
+        X {np.ndarray} -- First matrix, containing M examples with K features each.
+        Y {np.ndarray} -- Second matrix, containing N examples with K features each.
+
+    Returns:
+        D {np.ndarray}: MxN matrix with Cosine distances between rows of X and rows of Y.
+    """
+    M = len(X)
+    if Y.ndim == 1:
+        N = 1
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            dot = np.dot(X[m], Y)
+            Ux = np.linalg.norm(X[m])
+            Uy = np.linalg.norm(Y)
+
+            s = dot / (Ux * Uy)
+
+            D[m] = 1 - s
+    else:
+        N = len(Y)
+        D = np.zeros((M,N))
+
+        for m in range(0,M):
+            for n in range(0,N):
+                dot = np.dot(X[m], Y[n])
+                Ux = np.linalg.norm(X[m])
+                Uy = np.linalg.norm(Y[n])
+
+                s = dot / (Ux * Uy)
+
+                D[m,n] = 1 - s
+
+    return D

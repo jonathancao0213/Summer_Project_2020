@@ -6,7 +6,7 @@ import metrics
 # Decision Tree and Prior Probability (hw 1)
 from decision_tree import DecisionTree
 from prior_probability import PriorProbability
-# from k_nearest_neighbor import KNearestNeighbor
+from knn import KNearestNeighbor
 
 data = sys.argv[1]
 
@@ -41,14 +41,31 @@ elif model == "prior_probability":
     a = metrics.accuracy(testt, t)
     p, r = metrics.precision_and_recall(testt, t)
     f = metrics.f1_measure(testt, t)
-    num_nodes = 0
-    max_depth = 0
     print("Accuracy = %f\n" % a)
     print("Precision = %f, Recall = %f\n" % (p,r))
     print("F1 measure = %f\n" % f)
 
 elif model == "knn":
-    raise NotImplementError()
+    knn = KNearestNeighbor(10, distance_measure='euclidean', aggregator='mean')
+    knn.fit(trainf, traint)
+
+    labels = knn.predict(testf)
+    binary_labels = []
+    for each in labels:
+        if each > 0.5:
+            binary_labels.append(1)
+        else:
+            binary_labels.append(0)
+
+    binary_labels = np.asarray(binary_labels)
+
+    cm = metrics.confusion_matrix(testt, binary_labels)
+    a = metrics.accuracy(testt, binary_labels)
+    p, r = metrics.precision_and_recall(testt, binary_labels)
+    f = metrics.f1_measure(testt, binary_labels)
+    print("Accuracy = %f\n" % a)
+    print("Precision = %f, Recall = %f\n" % (p,r))
+    print("F1 measure = %f\n" % f)
 
 elif model == "linear_regression":
     raise NotImplementError()
