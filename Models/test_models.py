@@ -1,5 +1,4 @@
 import sys
-from numpy import genfromtxt
 import numpy as np
 # All metrics defined in here
 import metrics
@@ -8,8 +7,9 @@ from decision_tree import DecisionTree
 from prior_probability import PriorProbability
 # K Nearest Neighbor (hw2)
 from knn import KNearestNeighbor
-# K Means clustering (hw 5)
+# K Means and GMM clustering (hw 5)
 from kmeans import KMeans
+from gmm import GMM
 
 data = sys.argv[1]
 
@@ -77,9 +77,10 @@ elif model == "gradient_descent":
     raise NotImplementError()
 
 elif model == "kmeans":
-    m = KMeans(2)
-    m.fit(trainf)
-    labels = m.predict(testf)
+    # Need to make continuous for higher Mutual Info Score
+    kmeans = KMeans(2)
+    kmeans.fit(trainf)
+    labels = kmeans.predict(testf)
     #acc = metrics.adjusted_mutual_info(testt.flatten(), labels)
     print(np.subtract(labels,testt.flatten()))
 
@@ -92,7 +93,21 @@ elif model == "kmeans":
     print("F1 measure = %f\n" % f)
 
 elif model == "gmm":
-    raise NotImplementError()
+    # Also need to make continuous
+    gmm = GMM(2, 'spherical')
+    gmm.fit(trainf)
+    labels = gmm.predict(testf)
+    #acc = metrics.adjusted_mutual_info(testt.flatten(), labels)
+    print(np.subtract(labels,testt.flatten()))
+
+    cm = metrics.confusion_matrix(testt.flatten(), labels)
+    a = metrics.accuracy(testt.flatten(), labels)
+    p, r = metrics.precision_and_recall(testt.flatten(), labels)
+    f = metrics.f1_measure(testt.flatten(), labels)
+    print("Accuracy = %f\n" % a)
+    print("Precision = %f, Recall = %f\n" % (p,r))
+    print("F1 measure = %f\n" % f)
+
 
 elif model == "reinforcement":
     raise NotImplementError()
