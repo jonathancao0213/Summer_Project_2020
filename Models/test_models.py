@@ -10,6 +10,8 @@ from knn import KNearestNeighbor
 # K Means and GMM clustering (hw 5)
 from kmeans import KMeans
 from gmm import GMM
+#regression
+from linear_regression import LinearRegression
 
 data = sys.argv[1]
 
