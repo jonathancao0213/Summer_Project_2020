@@ -84,18 +84,18 @@ elif model == "linear_regression":
     target = GOOGL_closing_data[n:]
 
     #Train and Test
-    train_features, train_targets, test_features, test_targets = metrics.train_test_split(example0, targets)
-    train_features1, train_targets1, test_features1, test_targets1 = metrics.train_test_split(example1), targets)
-    x_train0, x_test0, y_train0, y_test0 = train_test_split(example0,target, test_size = 0.2, random_state = 20)
-    x_train1, x_test1, y_train1, y_test1 = train_test_split(example1,target, test_size = 0.2, random_state = 20)
+    train_features, train_targets, test_features, test_targets = metrics.train_test_split(example0, target, 0.8)
+    train_features1, train_targets1, test_features1, test_targets1 = metrics.train_test_split(example1, target,0.8)
+    # x_train0, x_test0, y_train0, y_test0 = train_test_split(example0,target, test_size = 0.2, random_state = 20)
+    # x_train1, x_test1, y_train1, y_test1 = train_test_split(example1,target, test_size = 0.2, random_state = 20)
     lr = LinearRegression()
-    lr.fit(x_train0, y_train0)
-    lr_confidence = lr.score(x_test0, y_test0)
+    lr.fit(train_features, train_targets)
+    lr_confidence = lr.score(test_features, test_targets)
     print("R2 score:", lr_confidence)
 
     lr1 = LinearRegression()
-    lr1.fit(x_train1, y_train1)
-    lr1_confidence = lr1.score(x_test1, y_test1)
+    lr1.fit(train_features1, train_targets1)
+    lr1_confidence = lr1.score(test_features1, test_targets1)
     print("R2 score1:", lr1_confidence)
 
 elif model == "gradient_descent":
