@@ -27,7 +27,3 @@ class LinearRegression():
         u = np.sum((targets-prediction)**2)
         v = np.sum((targets-np.mean(targets))**2)
         return (1-(u/v))
-
-
-    def testing():
-        raise 
