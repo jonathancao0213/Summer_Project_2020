@@ -2,7 +2,7 @@ import numpy as np
 from loss import SquaredLoss
 
 class GradientDescent():
-    def __init__(self, regularization=None, learning_rate = 0.000001):
+    def __init__(self, regularization=None, learning_rate = 0.0000012):
         self.learning_rate = learning_rate
         self.model = None
         self.loss = SquaredLoss(None)
