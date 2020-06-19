@@ -41,8 +41,8 @@ def create_database(apikey, tickerlist, replace=False):
             then we replace it by executing the program.
         Otherwise we create the database.
         """
-        if path.exists('%s_stock.csv' % ticker) and replace == False:
-            df = pd.read_csv('%s_stock.csv' % ticker)
+        if path.exists('Data/%s_stock.csv' % ticker) and replace == False:
+            df = pd.read_csv('Data/%s_stock.csv' % ticker)
             if not df.empty:
                 print("Database containing %s already exists, moving to next ticker." % ticker)
                 continue
@@ -68,7 +68,7 @@ def create_database(apikey, tickerlist, replace=False):
         prev_result = 0
         prev_close = 0
 
-        file = open('%s_stock.csv' % ticker, mode='w')
+        file = open('Data/%s_stock.csv' % ticker, mode='w')
         writer = csv.writer(file, delimiter=',')
 
         writer.writerow(['Time', 'Previous Trend', 'Yesterday Close to Today Open', 'Open to Moving Average', 'Open to 52 Wk Average', 'Volume to Moving Average', 'Buy'])
