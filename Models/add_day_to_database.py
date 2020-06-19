@@ -2,9 +2,12 @@ import sys
 import numpy as np
 import time
 import datetime
+from datetime import datetime
 import requests
+import csv
+from calculate_trend import first_derivative, second_derivative
 
-def add_day(apikey, tickerlist):
+def add_day(apikey, tickerlist, stock_avg, vol_avg):
     """
     This function adds onto an already existing database for a specific ticker.
     Adds today's data.
@@ -15,32 +18,76 @@ def add_day(apikey, tickerlist):
     apikey: apikey
     tickerlist: list of tickers in the format of ['TICKER1', 'TICKER2', etc]
     """
-    for ticker in tickerlist:
+    for i, ticker in enumerate(tickerlist):
         print("Adding today to the %s database" % ticker)
 
+        data = []
+        with open("Data/%s_stock_discrete.csv" % ticker, 'r') as file:
+            reader = csv.reader(file)
+            for each in reader:
+                data.append(each)
+
+        if data[-1][0] == datetime.strftime(datetime.now(), "%Y-%m-%d"):
+            print("Database was just updated with today's %s data, moving on to next ticker" % ticker)
+            continue
+
         link = 'https://api.tdameritrade.com/v1/marketdata/%s/quotes' % ticker
-        ten_days_link = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
+        history_link = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
         specs = {'apikey':apikey}
-        ten_days_specs = {'apikey':apikey, 'period':10, 'periodType':'day', 'frequency':1, 'frequencyType':'daily'}
+        month_specs = {'apikey':apikey, 'period':1, 'periodType':'month', 'frequency':1, 'frequencyType':'daily'}
         today = requests.get(url = link, params = specs)
-        ten_days = requests.get(url = ten_days_link, params = ten_days_specs)
+        month = requests.get(url = history_link, params = month_specs)
 
         today_data = today.json()
-        ten_days_data = ten_days.json()
+        month_data = month.json()
 
         stock = today_data[ticker]
-        print(stock)
+        two_weeks_data = month_data['candles'][:10]
 
-        # ask = stock['askPrice']
-        # bid = stock['bidPrice']
-        # yearhigh = stock['52WkHigh']
-        # yearlow = stock['52WkLow']
-        # daylow = stock['lowPrice']
-        # dayhigh = stock['highPrice']
-        # dayopen = stock['openPrice']
-        # dayclose = stock['closePrice']
-        # v = stock['volatility']
-        # time = datetime.date()
+        close, prev_result, past_day_trend, past_trend = first_derivative(two_weeks_data)
+        past_curve = second_derivative(two_weeks_data)
+
+        yearhigh = stock['52WkHigh']
+        yearlow = stock['52WkLow']
+        dayopen = stock['openPrice']
+        dayclose = stock['closePrice']
+        volume = stock['totalVolume']
+
+        if dayopen > close:
+            from_close_to_open = 1
+        else:
+            from_close_to_open = 0
+
+        if dayopen > stock_avg[i]:
+            open_to_moving_average = 1
+        else:
+            open_to_moving_average = 0
+
+        if dayopen > (yearhigh + yearlow)/2:
+            open_to_year_average = 1
+        else:
+            open_to_year_average = 0
+
+        if volume > vol_avg[i]:
+            volume_to_moving_average = 1
+        else:
+            volume_to_moving_average = 0
+
+        if dayclose > dayopen:
+            buy = 1
+        else:
+            buy = 0
+
+        file = open('Data/%s_stock_discrete.csv' % ticker, mode='a', newline='')
+        writer = csv.writer(file, delimiter=',')
+        writer.writerow([datetime.strftime(datetime.now(), "%Y-%m-%d"), \
+        prev_result, past_day_trend, past_trend, past_curve, from_close_to_open, \
+        open_to_moving_average, open_to_year_average, volume_to_moving_average, buy])
+
+        updated_stock_avg = (stock_avg[i]*len(data) + dayopen)/(len(data) + 1)
+        updated_vol_avg = (vol_avg[i]*len(data) + volume)/(len(data) + 1)
+
+    return updated_stock_avg, updated_vol_avg
 
 if __name__ == "__main__":
     add_day(sys.argv[1], sys.argv[2])

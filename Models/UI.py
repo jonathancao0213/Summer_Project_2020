@@ -12,12 +12,18 @@ with open('stock_watch.csv', newline = '') as e:
 tickerlist = tickerlist[1:]
 """
 
-def ui(apikey, tickerlist):
-    create_database(apikey, tickerlist)
+def ui(apikey, tickerlist, s_avg, v_avg):
+    stock_avg, vol_avg = create_database(apikey, tickerlist, s_avg, v_avg)
+    print(stock_avg)
+    print(vol_avg)
 
-    add_day(apikey, tickerlist)
+    stock_avg, vol_avg = add_day(apikey, tickerlist, stock_avg, vol_avg)
+
+    print(stock_avg)
+    print(vol_avg)
 
 if __name__ == "__main__":
     tickerlist = ast.literal_eval(sys.argv[2])
-    print(tickerlist)
-    ui(sys.argv[1], tickerlist)
+    stocklist = ast.literal_eval(sys.argv[3])
+    vollist = ast.literal_eval(sys.argv[4])
+    ui(sys.argv[1], tickerlist, stocklist, vollist)

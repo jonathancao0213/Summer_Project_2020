@@ -18,7 +18,7 @@ def keyboardInterruptHandler(signal, frame):
 signal.signal(signal.SIGINT, keyboardInterruptHandler)
 """
 
-def create_database(apikey, tickerlist, replace=False):
+def create_database(apikey, tickerlist, stock_avg, vol_avg, replace=False):
     """
     This function creates a database that contains the past year's stock data for companies in tickerlist.
 
@@ -30,6 +30,9 @@ def create_database(apikey, tickerlist, replace=False):
     replace: if replace is True, then even if the database with the ticker already exists,
         the program will still execute and replace it
     """
+    if len(stock_avg) != len(tickerlist) or len(vol_avg) != len(tickerlist):
+        stock_avg = [0]*len(tickerlist)
+        vol_avg = [0]*len(tickerlist)
 
     for j, ticker in enumerate(tickerlist):
         print("Creating %s database..." % ticker)
@@ -41,8 +44,8 @@ def create_database(apikey, tickerlist, replace=False):
             then we replace it by executing the program.
         Otherwise we create the database.
         """
-        if path.exists('Data/%s_stock.csv' % ticker) and replace == False:
-            df = pd.read_csv('Data/%s_stock.csv' % ticker)
+        if path.exists('Data/%s_stock_discrete.csv' % ticker) and replace == False:
+            df = pd.read_csv('Data/%s_stock_discrete.csv' % ticker)
             if not df.empty:
                 print("Database containing %s already exists, moving to next ticker." % ticker)
                 continue
@@ -68,19 +71,28 @@ def create_database(apikey, tickerlist, replace=False):
         prev_result = 0
         prev_close = 0
 
-        file = open('Data/%s_stock.csv' % ticker, mode='w')
+        file = open('Data/%s_stock_discrete.csv' % ticker, mode='w', newline='')
         writer = csv.writer(file, delimiter=',')
 
-        writer.writerow(['Time', 'Previous Trend', 'Yesterday Close to Today Open', 'Open to Moving Average', 'Open to 52 Wk Average', 'Volume to Moving Average', 'Buy'])
+        writer.writerow(['Time', 'Previous Trend', 'Past 10 Days Day Open to Close Slope', 'Past 10 Days Overall Slope', 'Past 10 Days Second Derivative', 'Yesterday Close to Today Open', 'Open to Moving Average', 'Open to 52 Wk Average', 'Volume to Moving Average', 'Buy'])
 
         for i, row in enumerate(history_data['candles']):
+            if i in range(0,10):
+                past_trend = 0
+                past_day_trend = 0
+                past_curve = 0
+            else:
+                trend_data = history_data['candles'][i-10:i-1]
+                a, b, past_trend, past_day_trend = first_derivative(trend_data)
+                past_curve = second_derivative(trend_data)
+
             dayopen = row['open']
             dayhigh = row['high']
             daylow = row['low']
             dayclose = row['close']
             volume = row['volume']
             t = row['datetime']/1000.0
-            time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S.%f')
+            time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
 
             if prev_close <= dayopen: # checking if the price went up from yesterday's close to today's open
                 from_close_to_open = 1
@@ -106,7 +118,7 @@ def create_database(apikey, tickerlist, replace=False):
                 buy = 1
             else:
                 buy = 0
-            writer.writerow([time, prev_result, from_close_to_open, open_to_moving_average, open_to_year_average, volume_to_moving_average, buy])
+            writer.writerow([time, prev_result, past_day_trend, past_trend, past_curve, from_close_to_open, open_to_moving_average, open_to_year_average, volume_to_moving_average, buy])
 
             # previous day's trend is whether it went up or down
             prev_result = buy
@@ -129,8 +141,14 @@ def create_database(apikey, tickerlist, replace=False):
             #     writer.writerow([time, yearhigh, yearlow, dayhigh, daylow, dayopen, dayclose, volume, v])
 
         print("Database for %s has been created." % ticker)
+        stock_avg[j] = stock_moving_average
+        vol_avg[j] = volume_moving_average
 
     print("Completed creating databases.\n")
+    return stock_avg, vol_avg
 
 if __name__ == "__main__":
-    create_database(sys.argv[1], sys.argv[2], replace=True)
+    tickerlist = ast.literal_eval(sys.argv[2])
+    stocklist = ast.literal_eval(sys.argv[3])
+    vollist = ast.literal_eval(sys.argv[4])
+    create_database(sys.argv[1], tickerlist, stocklist, vollist, replace=True)
