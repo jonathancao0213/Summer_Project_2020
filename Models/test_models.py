@@ -12,6 +12,8 @@ from kmeans import KMeans
 from gmm import GMM
 #regression
 from linear_regression import LinearRegression
+#GD
+from gradient_descent import GradientDescent
 
 data = sys.argv[1]
 
@@ -87,8 +89,6 @@ elif model == "linear_regression":
     #Train and Test
     train_features, train_targets, test_features, test_targets = metrics.train_test_split(example0, target, 0.8)
     train_features1, train_targets1, test_features1, test_targets1 = metrics.train_test_split(example1, target,0.8)
-    # x_train0, x_test0, y_train0, y_test0 = train_test_split(example0,target, test_size = 0.2, random_state = 20)
-    # x_train1, x_test1, y_train1, y_test1 = train_test_split(example1,target, test_size = 0.2, random_state = 20)
     lr = LinearRegression()
     lr.fit(train_features, train_targets)
     lr_confidence = lr.score(test_features, test_targets)
@@ -100,7 +100,21 @@ elif model == "linear_regression":
     print("R2 score1:", lr1_confidence)
 
 elif model == "gradient_descent":
-    raise NotImplementError()
+    GOOGL_closing_data = features[:,5].reshape(-1,1)
+    n = 3
+
+    #Data Processing
+    data0 = features[:,5]
+    example0 = data0[:-n].reshape(-1,1)
+    target = GOOGL_closing_data[n:]
+
+
+    #Train and Test
+    train_features, train_targets, test_features, test_targets = metrics.train_test_split(example0, target, 0.8)
+    gd = GradientDescent()
+    gd.fit(train_features, train_targets)
+    gd_confidence = gd.score(test_features, test_targets)
+    print("R2 score:", gd_confidence)
 
 elif model == "kmeans":
     # Need to make continuous for higher Mutual Info Score

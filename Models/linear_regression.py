@@ -1,6 +1,4 @@
 import numpy as np
-from numpy import genfromtxt
-from sklearn.model_selection import train_test_split
 
 class LinearRegression():
     def __init__(self):
@@ -17,6 +15,7 @@ class LinearRegression():
 
     #Apply weights to the independent variables
     def predict(self,features):
+        print(self.weights)
         ones = np.ones((len(features),1))
         features_new = np.concatenate((ones,features),axis = 1)
         return np.matmul(features_new,self.weights)
