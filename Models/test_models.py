@@ -25,7 +25,6 @@ trainf, traint, testf, testt = metrics.train_test_split(features, targets, fract
 
 if model == "decision_tree":
     tree = DecisionTree(attribute_names)
-    print(attribute_names)
     tree.fit(trainf, traint)
     num_nodes, max_depth = tree.tree_attributes(tree.tree)
     t = tree.predict(testf)
