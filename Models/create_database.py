@@ -46,6 +46,7 @@ def create_database(apikey, ticker, replace=False):
         then we replace it by executing the program.
     Otherwise we create the database.
     """
+
     if path.exists('Data/%s_stock_normalized.csv' % ticker) and replace == False:
         df = pd.read_csv('Data/%s_stock_normalized.csv' % ticker)
         if not df.empty:
@@ -77,6 +78,7 @@ def create_database(apikey, ticker, replace=False):
     yearlow = overall_data[ticker]['52WkLow']
 
     stock_moving_average = 0
+    volume_moving_average = 0
     max_volume = float('-inf')
     min_volume = float('inf')
     prev_result = 0
@@ -115,11 +117,10 @@ def create_database(apikey, ticker, replace=False):
         else:
             stock_moving_average = (stock_moving_average * i + dayopen) / (i + 1)
 
-        # Update min and max volume
-        if volume < min_volume:
-            min_volume = volume
-        if volume > max_volume:
-            max_volume = volume
+        if i == 0:
+            volume_moving_average = volume_moving_average + volume
+        else:
+            volume_moving_average = (volume_moving_average * i + volume) / (i + 1)
         """
         ------------------------------------------------------------------------
         """
@@ -128,13 +129,13 @@ def create_database(apikey, ticker, replace=False):
         normalized_day_change = (dayclose - dayopen) / dayopen
 
         # Normalized volume compared to max and min volume
-        normalized_volume = (volume - min_volume + 1) / (max_volume - min_volume + 1)
+        normalized_volume_to_moving_average = volume*0.5/volume_moving_average
 
         # Normalized day open compared to 52wk high and low
         normalized_open_to_year = (dayopen - yearlow) / (yearhigh - yearlow)
 
         # Normalized day open to moving average
-        normalized_open_to_moving_average = dayopen/stock_moving_average
+        normalized_open_to_moving_average = dayopen*0.5/stock_moving_average
 
         if i in range(0,10):
             if i == 0:
@@ -158,24 +159,26 @@ def create_database(apikey, ticker, replace=False):
         else:
             buy = 0
 
-        data.append([time, dayopen, dayclose, normalized_day_change, normalized_volume, normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close, past_second_derivative,0])
+        data.append([time, volume, dayopen, dayclose, normalized_day_change, \
+        normalized_volume_to_moving_average, normalized_open_to_moving_average, \
+        normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, \
+        past_avg_normalized_open_to_close, past_second_derivative,-1])
         if i != 0:
             data[i-1][-1] = buy
 
     file = open('Data/%s_stock_normalized.csv' % ticker, mode='w', newline='')
     writer = csv.writer(file, delimiter=',')
 
-    writer.writerow(['Time', 'Day Open', 'Day Close', 'Normalized Day Change', \
-    'Normalized Volume (High/Low)', 'Normalized Open (52wk High/Low)', \
-    'Normalized Yesterday Close to Today Open', 'Past First Derivative', \
-    'Past Average Normalized Open to Close', 'Past Second Derivative', 'Buy'])
+    writer.writerow(['Time', 'Volume', 'Day Open', 'Day Close', 'Normalized Day Change', \
+    'Normalized Volume to Moving Average', 'Normalized Open to Moving Average',\
+    'Normalized Open (52wk High/Low)', 'Normalized Yesterday Close to Today Open', \
+    'Past First Derivative', 'Past Average Normalized Open to Close', 'Past Second Derivative', 'Buy'])
 
     for row in data:
         writer.writerow(row)
 
     print("Database for %s has been created." % ticker)
 
-    return stock_moving_average
 
 if __name__ == "__main__":
     create_database(sys.argv[1], sys.argv[2], replace=True)

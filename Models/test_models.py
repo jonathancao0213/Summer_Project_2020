@@ -18,6 +18,7 @@ from gradient_descent import GradientDescent
 data = sys.argv[1]
 
 features, targets, attribute_names = metrics.load_data("Data/" + data)
+today = features[-1,:]
 
 model = sys.argv[2]
 
@@ -30,6 +31,10 @@ if model == "decision_tree":
     tree.fit(trainf, traint)
     num_nodes, max_depth = tree.tree_attributes(tree.tree)
     t = tree.predict(testf)
+    print(t)
+    decision = tree.predict(today)
+    #print(decision)
+    #print("Should you buy tomorrow with today's data? %d" % decision)
     cm = metrics.confusion_matrix(testt, t)
     a = metrics.accuracy(testt, t)
     p, r = metrics.precision_and_recall(testt, t)
@@ -42,6 +47,9 @@ elif model == "prior_probability":
     prob = PriorProbability()
     prob.fit(trainf, traint)
     t = prob.predict(testf)
+    print(t)
+    decision = prob.predict(today)
+    print(decision)
     #raise ValueError(t)
     cm = metrics.confusion_matrix(testt, t)
     a = metrics.accuracy(testt, t)
@@ -56,6 +64,7 @@ elif model == "knn":
     knn.fit(trainf, traint)
 
     labels = knn.predict(testf)
+    print(labels)
     binary_labels = []
     for each in labels:
         if each > 0.5:
@@ -122,7 +131,7 @@ elif model == "kmeans":
     kmeans.fit(trainf)
     labels = kmeans.predict(testf)
     #acc = metrics.adjusted_mutual_info(testt.flatten(), labels)
-    print(np.subtract(labels,testt.flatten()))
+    print(labels)
 
     cm = metrics.confusion_matrix(testt.flatten(), labels)
     a = metrics.accuracy(testt.flatten(), labels)
@@ -138,7 +147,7 @@ elif model == "gmm":
     gmm.fit(trainf)
     labels = gmm.predict(testf)
     #acc = metrics.adjusted_mutual_info(testt.flatten(), labels)
-    print(np.subtract(labels,testt.flatten()))
+    print(labels)
 
     cm = metrics.confusion_matrix(testt.flatten(), labels)
     a = metrics.accuracy(testt.flatten(), labels)
