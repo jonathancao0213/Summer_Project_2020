@@ -29,13 +29,13 @@ class Agent(gym.Env):
 
     def _take_action(self, action):
         #if do nothing
-        if action = 0:
+        if action == 0:
             pass
         #if buy stock
-        elif action = 1:
+        elif action == 1:
             #subtract balance and add investment by the day close
             self.balance -= data[self.current_day, 1]
-            self.investment += 1
+            self.number_of_stocks += 1
 
     def step(self, action):
         self._take_action(action)
@@ -44,7 +44,7 @@ class Agent(gym.Env):
 
         reward = (self.balance + self.number_of_stocks*data[self.current_day,1])  * (self.current_day/365)
 
-        done = (self.balance + self.number_of_stocks) <= 0
+        done = (self.balance + self.number_of_stocks*data[self.current_day,1]) <= 0
 
         observations = self._next_day()
 
@@ -56,4 +56,3 @@ class Agent(gym.Env):
         self.current_day = 0
 
         return self._next_day()
-        
