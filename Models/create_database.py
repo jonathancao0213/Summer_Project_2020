@@ -8,6 +8,7 @@ import signal
 import datetime
 import pandas as pd
 from calculate_trend import first_derivative, second_derivative
+from newscrawl import pair_ticker
 
 # Set up keyboard interrupt to stop updating the csv file
 # No longer needed but just kept for future reference
@@ -76,6 +77,8 @@ def create_database(apikey, ticker, replace=False):
 
     yearhigh = overall_data[ticker]['52WkHigh']
     yearlow = overall_data[ticker]['52WkLow']
+
+    name = overall_data[ticker]['description']
 
     stock_moving_average = 0
     volume_moving_average = 0
