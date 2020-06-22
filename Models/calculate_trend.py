@@ -19,7 +19,7 @@ def first_derivative(data):
 
     for i, val in enumerate(all):
         if i%2 == 0:
-            open_to_close.append(all[i+1] - val)
+            open_to_close.append((all[i+1] - val + 1) / (val + 1))
 
         if i == 0 or i == len(all) - 1:
             pass
@@ -28,9 +28,12 @@ def first_derivative(data):
             d = float(str(round(d, 5)))
             derivatives.append(d)
 
-    avg_prime = sum(derivatives)/len(derivatives)
-    avg_day = sum(open_to_close)/len(open_to_close)
-    return all[-1], open_to_close[-1], avg_prime, avg_day
+    past_first_derivative = sum(derivatives)/len(derivatives)
+    past_avg_normalized_open_to_close = sum(open_to_close)/len(open_to_close)
+
+    yesterday_close_to_today_open = (all[-3] - all[-2])/all[-3]
+
+    return yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close
 
 
 def second_derivative(data):
@@ -48,5 +51,5 @@ def second_derivative(data):
             d = float(str(round(d, 5)))
             derivatives2.append(d)
 
-    avg_prime2 = sum(derivatives2)/len(derivatives2)
-    return avg_prime2
+    past_second_derivative = sum(derivatives2)/len(derivatives2)
+    return past_second_derivative

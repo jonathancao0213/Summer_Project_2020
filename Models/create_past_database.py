@@ -1,4 +1,5 @@
 import requests
+import numpy as np
 import sys
 import os.path
 from os import path
@@ -18,7 +19,7 @@ def keyboardInterruptHandler(signal, frame):
 signal.signal(signal.SIGINT, keyboardInterruptHandler)
 """
 
-def create_database(apikey, tickerlist, stock_avg, vol_avg, replace=False):
+def create_database(apikey, ticker, replace=False):
     """
     This function creates a database that contains the past year's stock data for companies in tickerlist.
 
@@ -30,125 +31,151 @@ def create_database(apikey, tickerlist, stock_avg, vol_avg, replace=False):
     replace: if replace is True, then even if the database with the ticker already exists,
         the program will still execute and replace it
     """
-    if len(stock_avg) != len(tickerlist) or len(vol_avg) != len(tickerlist):
-        stock_avg = [0]*len(tickerlist)
-        vol_avg = [0]*len(tickerlist)
 
-    for j, ticker in enumerate(tickerlist):
-        print("Creating %s database..." % ticker)
+    # if len(stock_avg) != len(tickerlist) or len(vol_avg) != len(tickerlist):
+    #     stock_avg = [0]*len(tickerlist)
+    #     vol_avg = [0]*len(tickerlist)
+
+    # for j, ticker in enumerate(tickerlist):
+    print("Creating %s database..." % ticker)
+    """
+    Checking if the database already exists and isn't empty.
+    If the database exists and isn't empty and replace == False, then we
+        move on to the next ticker
+    If the database exists and replace == True,
+        then we replace it by executing the program.
+    Otherwise we create the database.
+    """
+    if path.exists('Data/%s_stock_normalized.csv' % ticker) and replace == False:
+        df = pd.read_csv('Data/%s_stock_normalized.csv' % ticker)
+        if not df.empty:
+            print("Database containing %s already exists, moving to next ticker." % ticker)
+            stock_moving_average = []
+            file = open("Data/%s_stock_normaized.csv" % ticker, mode='r')
+            reader = csv.reader(file, delimiter=',')
+            for i, data in enumerate(reader):
+                if i == 0:
+                    continue
+                stock_moving_average.append(data[1])
+
+            return sum(stock_moving_average)/len(stock_moving_average)
+
+    # Get price history
+    link = 'https://api.tdameritrade.com/v1/marketdata/%s/quotes' % ticker
+    historylink = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
+
+    specs = {'apikey':apikey}
+    history_specs = {'apikey':apikey, 'period':1, 'periodType':'year', 'frequency':1, 'frequencyType':'daily'}
+
+    overall = requests.get(url = link, params = specs)
+    history = requests.get(url = historylink, params = history_specs)
+
+    overall_data = overall.json()
+    history_data = history.json()
+
+    yearhigh = overall_data[ticker]['52WkHigh']
+    yearlow = overall_data[ticker]['52WkLow']
+
+    stock_moving_average = 0
+    max_volume = float('-inf')
+    min_volume = float('inf')
+    prev_result = 0
+    prev_close = 0
+
+    d = history_data['candles']
+
+    # Makes a data np array
+    data = []
+    for i, row in enumerate(d):
         """
-        Checking if the database already exists and isn't empty.
-        If the database exists and isn't empty and replace == False, then we
-            move on to the next ticker
-        If the database exists and replace == True,
-            then we replace it by executing the program.
-        Otherwise we create the database.
+        Gets normalized past data trends
+
+        yesterday_close_to_today_open: returns the percent increase/decrease from yesterday close to today open
+        past_first_derivative: returns the average slope of the past 2 weeks
+        past_avg_normalized_open_to_close: returns the average normalized day open to day close percent increase/decrease
+        past_second_derivative: returns the average second derivative of the past 2 weeks
+
+        In the case of data within the first 2 weeks, return past data trends of however many days have passed since epoche
+
         """
-        if path.exists('Data/%s_stock_discrete.csv' % ticker) and replace == False:
-            df = pd.read_csv('Data/%s_stock_discrete.csv' % ticker)
-            if not df.empty:
-                print("Database containing %s already exists, moving to next ticker." % ticker)
-                continue
 
-        # Get price history
-        link = 'https://api.tdameritrade.com/v1/marketdata/%s/quotes' % ticker
-        historylink = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
+        dayopen = row['open']
+        dayclose = row['close']
+        volume = row['volume']
+        t = row['datetime']/1000
+        time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
 
-        specs = {'apikey':apikey}
-        history_specs = {'apikey':apikey, 'period':1, 'periodType':'year', 'frequency':1, 'frequencyType':'daily'}
+        """
+        Updates
+        ------------------------------------------------------------------------
+        """
+        # Update stock_moving_average
+        if i == 0:
+            stock_moving_average = stock_moving_average + dayopen
+        else:
+            stock_moving_average = (stock_moving_average * i + dayopen) / (i + 1)
 
-        overall = requests.get(url = link, params = specs)
-        history = requests.get(url = historylink, params = history_specs)
+        # Update min and max volume
+        if volume < min_volume:
+            min_volume = volume
+        if volume > max_volume:
+            max_volume = volume
+        """
+        ------------------------------------------------------------------------
+        """
 
-        overall_data = overall.json()
-        history_data = history.json()
+        # Percent change of day close vs day open
+        normalized_day_change = (dayclose - dayopen) / dayopen
 
-        yearhigh = overall_data[ticker]['52WkHigh']
-        yearlow = overall_data[ticker]['52WkLow']
+        # Normalized volume compared to max and min volume
+        normalized_volume = (volume - min_volume + 1) / (max_volume - min_volume + 1)
 
-        stock_moving_average = 0
-        volume_moving_average = 0
-        prev_result = 0
-        prev_close = 0
+        # Normalized day open compared to 52wk high and low
+        normalized_open_to_year = (dayopen - yearlow) / (yearhigh - yearlow)
 
-        file = open('Data/%s_stock_discrete.csv' % ticker, mode='w', newline='')
-        writer = csv.writer(file, delimiter=',')
+        # Normalized day open to moving average
+        normalized_open_to_moving_average = dayopen/stock_moving_average
 
-        writer.writerow(['Time', 'Previous Trend', 'Past 10 Days Day Open to Close Slope', 'Past 10 Days Overall Slope', 'Past 10 Days Second Derivative', 'Yesterday Close to Today Open', 'Open to Moving Average', 'Open to 52 Wk Average', 'Volume to Moving Average', 'Buy'])
-
-        for i, row in enumerate(history_data['candles']):
-            if i in range(0,10):
-                past_trend = 0
-                past_day_trend = 0
-                past_curve = 0
+        if i in range(0,10):
+            if i == 0:
+                past_first_derivative = 0
+                past_avg_normalized_open_to_close = 0
+                past_second_derivative = 0
+                yesterday_close_to_today_open = 0
             else:
-                trend_data = history_data['candles'][i-10:i-1]
-                a, b, past_trend, past_day_trend = first_derivative(trend_data)
-                past_curve = second_derivative(trend_data)
+                yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close = first_derivative(d[0:i+1])
+                if i == 1:
+                    past_second_derivative = 0
+                else:
+                    past_second_derivative = second_derivative(d[0:i])
+        else:
+            yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close = first_derivative(d[i-9:i])
+            past_second_derivative = second_derivative(d[i-9:i])
 
-            dayopen = row['open']
-            dayhigh = row['high']
-            daylow = row['low']
-            dayclose = row['close']
-            volume = row['volume']
-            t = row['datetime']/1000.0
-            time = datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d')
+        # Seeing if today should have been buy or not
+        if dayclose > dayopen:
+            buy = 1
+        else:
+            buy = 0
 
-            if prev_close <= dayopen: # checking if the price went up from yesterday's close to today's open
-                from_close_to_open = 1
-            else:
-                from_close_to_open = 0
+        data.append([time, dayopen, dayclose, normalized_day_change, normalized_volume, normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close, past_second_derivative,0])
+        if i != 0:
+            data[i-1][-1] = buy
 
-            if dayopen > stock_moving_average: # check if the price is higher than moving average
-                open_to_moving_average = 1
-            else:
-                open_to_moving_average = 0
+    file = open('Data/%s_stock_normalized.csv' % ticker, mode='w', newline='')
+    writer = csv.writer(file, delimiter=',')
 
-            if dayopen > (yearhigh + yearlow) / 2: # check if the price is higher than 52wk average
-                open_to_year_average = 1
-            else:
-                open_to_year_average = 0
+    writer.writerow(['Time', 'Day Open', 'Day Close', 'Normalized Day Change', \
+    'Normalized Volume (High/Low)', 'Normalized Open (52wk High/Low)', \
+    'Normalized Yesterday Close to Today Open', 'Past First Derivative', \
+    'Past Average Normalized Open to Close', 'Past Second Derivative', 'Buy'])
 
-            if volume > volume_moving_average: # check if the volume is higher than the moving average
-                volume_to_moving_average = 1
-            else:
-                volume_to_moving_average = 0
+    for row in data:
+        writer.writerow(row)
 
-            if dayclose > dayopen: # checking if day close is greater than day open
-                buy = 1
-            else:
-                buy = 0
-            writer.writerow([time, prev_result, past_day_trend, past_trend, past_curve, from_close_to_open, open_to_moving_average, open_to_year_average, volume_to_moving_average, buy])
+    print("Database for %s has been created." % ticker)
 
-            # previous day's trend is whether it went up or down
-            prev_result = buy
-
-            # update previous close
-            prev_close = dayclose
-
-            #update moving volume average
-            totalv = volume_moving_average * i
-            totalv += volume
-            volume_moving_average = totalv / (i+1)
-
-            # update moving dayopen average
-            total = stock_moving_average * i
-            total += dayopen
-            stock_moving_average = total / (i+1)
-
-            # with open('%s_stock.csv' % ticker, mode='w') as file:
-            #     writer = csv.writer(file, delimiter=',')
-            #     writer.writerow([time, yearhigh, yearlow, dayhigh, daylow, dayopen, dayclose, volume, v])
-
-        print("Database for %s has been created." % ticker)
-        stock_avg[j] = stock_moving_average
-        vol_avg[j] = volume_moving_average
-
-    print("Completed creating databases.\n")
-    return stock_avg, vol_avg
+    return stock_moving_average
 
 if __name__ == "__main__":
-    tickerlist = ast.literal_eval(sys.argv[2])
-    stocklist = ast.literal_eval(sys.argv[3])
-    vollist = ast.literal_eval(sys.argv[4])
-    create_database(sys.argv[1], tickerlist, stocklist, vollist, replace=True)
+    create_database(sys.argv[1], sys.argv[2], replace=True)
