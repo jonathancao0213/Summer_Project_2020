@@ -162,7 +162,7 @@ def create_database(apikey, ticker, replace=False):
         data.append([time, volume, dayopen, dayclose, normalized_day_change, \
         normalized_volume_to_moving_average, normalized_open_to_moving_average, \
         normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, \
-        past_avg_normalized_open_to_close, past_second_derivative,0])
+        past_avg_normalized_open_to_close, past_second_derivative,-1])
         if i != 0:
             data[i-1][-1] = buy
 
@@ -179,7 +179,6 @@ def create_database(apikey, ticker, replace=False):
 
     print("Database for %s has been created." % ticker)
 
-    return stock_moving_average
 
 if __name__ == "__main__":
     create_database(sys.argv[1], sys.argv[2], replace=True)
