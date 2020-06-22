@@ -59,7 +59,12 @@ class DecisionTree():
         self.tree = None
 
     def _check_input(self, features):
-        if features.shape[1] != len(self.attribute_names):
+        if features.ndim == 1:
+            if len(features) != len(self.attribute_names):
+                raise ValueError(
+                    "Number of features and number of attribute names must match!\n Attributes are: %s\n Features are: %s" % (self.attribute_names, features)
+                )
+        elif features.shape[1] != len(self.attribute_names):
             raise ValueError(
                 "Number of features and number of attribute names must match!\n Attributes are: %s\n Features are: %s" % (self.attribute_names, features)
             )
@@ -153,7 +158,10 @@ class DecisionTree():
         targets = []
 
         for entry in features:
-            entry = list(entry)
+            if features.ndim == 1:
+                entry = list(features)
+            else:
+                entry = list(entry)
             T = self.tree
             while T.branches:
                 if len(T.branches) == 1:
