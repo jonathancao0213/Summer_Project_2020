@@ -58,7 +58,7 @@ def load_data(data_path):
     attribute_names = cols[1:-1]
 
     # Use list comprehension to remove the unwanted column in **usecol**
-    features = np.asarray(pd.read_csv(data_path, usecols=[i for i in cols if i != 'Time' and i != 'Buy']))
+    features = np.asarray(pd.read_csv(data_path, usecols=[i for i in cols if i != 'Time' and i != 'Buy' and i != 'Day Open' and i != 'Day Close' and i != 'Volume']))
     targets = np.asarray(pd.read_csv(data_path, usecols=['Buy']))
 
     features = features.astype(np.float)

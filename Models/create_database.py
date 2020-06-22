@@ -159,14 +159,17 @@ def create_database(apikey, ticker, replace=False):
         else:
             buy = 0
 
-        data.append([time, dayopen, dayclose, normalized_day_change, normalized_volume_to_moving_average, normalized_open_to_moving_average, normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close, past_second_derivative,0])
+        data.append([time, volume, dayopen, dayclose, normalized_day_change, \
+        normalized_volume_to_moving_average, normalized_open_to_moving_average, \
+        normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, \
+        past_avg_normalized_open_to_close, past_second_derivative,0])
         if i != 0:
             data[i-1][-1] = buy
 
     file = open('Data/%s_stock_normalized.csv' % ticker, mode='w', newline='')
     writer = csv.writer(file, delimiter=',')
 
-    writer.writerow(['Time', 'Day Open', 'Day Close', 'Normalized Day Change', \
+    writer.writerow(['Time', 'Volume', 'Day Open', 'Day Close', 'Normalized Day Change', \
     'Normalized Volume to Moving Average', 'Normalized Open to Moving Average',\
     'Normalized Open (52wk High/Low)', 'Normalized Yesterday Close to Today Open', \
     'Past First Derivative', 'Past Average Normalized Open to Close', 'Past Second Derivative', 'Buy'])
