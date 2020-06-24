@@ -8,7 +8,6 @@ import signal
 import datetime
 import pandas as pd
 from calculate_trend import first_derivative, second_derivative
-from newscrawl import pair_ticker
 
 # Set up keyboard interrupt to stop updating the csv file
 # No longer needed but just kept for future reference
@@ -19,6 +18,21 @@ def keyboardInterruptHandler(signal, frame):
 
 signal.signal(signal.SIGINT, keyboardInterruptHandler)
 """
+
+def pair_ticker(ticker, name):
+    with open("Data/pair_ticker.csv", mode='r') as read_file:
+        reader = csv.reader(read_file)
+        f = list(reader)
+
+    for row in f:
+        if row.count(ticker) > 0:
+            print("Ticker (%s) and company name (%s) already exists" % (ticker, row[1]))
+            return
+
+    file = open("Data/pair_ticker.csv", mode='a', newline='')
+    writer = csv.writer(file, delimiter=',')
+    name = name.split(" - ")
+    writer.writerow([ticker, name[0]])
 
 def create_database(apikey, ticker, replace=False):
     """
@@ -78,7 +92,9 @@ def create_database(apikey, ticker, replace=False):
     yearhigh = overall_data[ticker]['52WkHigh']
     yearlow = overall_data[ticker]['52WkLow']
 
+    # Pair ticker
     name = overall_data[ticker]['description']
+    pair_ticker(ticker, name)
 
     stock_moving_average = 0
     volume_moving_average = 0

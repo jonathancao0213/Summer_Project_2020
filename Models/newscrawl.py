@@ -1,46 +1,40 @@
 import bs4
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
+from lxml import etree
 import csv
 import sys
 import requests
 
-def get_news_for(ticker):
+def get_news_for():
     # First from bloomberg.com
-    url = "https://www.bloomberg.com/"
+    url = "https://finance.yahoo.com/news/"
+    print("Scraping from %s" % url)
 
     client = urlopen(url)
     html = client.read()
     client.close()
 
     page = soup(html, "html.parser")
+    file = open("Data/news.txt", mode='a', newline='')
 
-    #print(page)
+    #print(page.find_all("li", attrs={"class": "js-stream-content Pos(r)"}))
+    news = page.find_all("li")
+    for n in news:
+        if n.has_attr("data-reactid"):
+            if n.has_attr("aria-label"):
+                dat = '|' + n.a["aria-label"]
+            else:
+                continue
+        file.write(dat + '\n')
 
-    #print(page.head) # prints the <head></head>
-
-def pair_ticker(ticker, name):
-    with open("Data/pair_ticker.csv", mode='r') as read_file:
-        reader = csv.reader(read_file)
-        f = list(reader)
-
-    for row in f:
-        if row.count(ticker) > 0:
-            print("Ticker (%s) and company name (%s) already exists" % (ticker, row[1]))
-            return
-
-    file = open("Data/pair_ticker.csv", mode='a', newline='')
-    writer = csv.writer(file, delimiter=',')
-    name = name.split(" - ")
-    writer.writerow([ticker, name[0]])
+    news = page.find_all("p", {"class":"Fz(14px) Lh(19px) Fz(13px)--sm1024 Lh(17px)--sm1024 LineClamp(2,38px) LineClamp(2,34px)--sm1024 M(0)"})#[0].get_text())
+    for n in news:
+        line = n.get_text().replace('\n', '')
+        file.write('|'+ line + '\n')
+    file.close()
 
 
 
 if __name__ == "__main__":
-    apikey = sys.argv[1]
-    ticker = sys.argv[2]
-    link = 'https://api.tdameritrade.com/v1/marketdata/%s/quotes' % ticker
-    specs = {'apikey':apikey}
-    d = requests.get(url = link, params = specs)
-    data = d.json()
-    pair_ticker(ticker, data[ticker]['description'])
+    get_news_for()
