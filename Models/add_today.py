@@ -86,7 +86,7 @@ def add_day(apikey, ticker):
     data.append([time, volume, dayopen, dayclose, normalized_day_change, \
     normalized_volume_to_moving_average, normalized_open_to_moving_average, \
     normalized_open_to_year, yesterday_close_to_today_open, past_first_derivative, \
-    past_avg_normalized_open_to_close, past_second_derivative,0])
+    past_avg_normalized_open_to_close, past_second_derivative,-1])
 
     file = open('Data/%s_stock_normalized.csv' % ticker, mode='w', newline='')
     writer = csv.writer(file, delimiter=',')
