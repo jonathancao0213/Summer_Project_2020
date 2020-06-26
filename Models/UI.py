@@ -1,6 +1,5 @@
-import sys, ast
-from create_past_database import create_database
-from add_day_to_database import add_day
+import sys, ast, csv
+from add_today import add_day
 
 """
 with open('stock_watch.csv', newline = '') as e:
@@ -12,10 +11,12 @@ with open('stock_watch.csv', newline = '') as e:
 tickerlist = tickerlist[1:]
 """
 
-def ui(apikey, ticker, s_avg, v_avg):
-    create_database(apikey, ticker, s_avg, v_avg)
-
-    add_day(apikey, ticker, stock_avg, vol_avg)
+def ui(apikey):
+    with open("Data/pair_ticker.csv", mode='r') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+    for company in data:
+        add_day(apikey, company[0])
 
 if __name__ == "__main__":
-    ui(sys.argv[1], sys.argv[2])
+    ui(sys.argv[1])
