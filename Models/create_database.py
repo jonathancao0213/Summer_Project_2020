@@ -1,5 +1,4 @@
 import requests
-import numpy as np
 import sys
 import os.path
 from os import path
@@ -105,7 +104,6 @@ def create_database(apikey, ticker, replace=False):
 
     d = history_data['candles']
 
-    # Makes a data np array
     data = []
     for i, row in enumerate(d):
         """
