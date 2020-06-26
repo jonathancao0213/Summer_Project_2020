@@ -47,15 +47,19 @@ def get_news_for(source=None):
         line = n.get_text().replace('\n', '')
         first_sentence = line.split('.')[0]
         if check_if_news_exists(first_sentence, data) == False:
-            file.write('|'+ line + '\n')
+            print(line)
+            if "increase" in line or "higher" in line or "gain" in line or "rise" in line or "outperform" in line:
+                file.write('3|'+ line + '\n')
+            elif "decrease" in line or "lower" in line or "loss" in line or "drop" in line or "fell" in line or "underperform" in line or "bankruptcy" in line:
+                file.write('1|'+ line + '\n')
+            else:
+                file.write('|'+ line + '\n')
     file.close()
 
 def check_if_news_exists(first_sentence, data):
     for row in data:
         if first_sentence in row.replace('|',''):
-            print("True")
             return True
-    print("False")        
     return False
 
 if __name__ == "__main__":

@@ -39,6 +39,9 @@ def add_day(apikey, ticker):
     if data[-1][0] == datetime.strftime(datetime.now(), "%Y-%m-%d"):
         print("Database was just updated with today's %s data, moving on to next ticker" % ticker)
         return 0
+    if datetime.today().weekday() == 5 or datetime.today().weekday() == 6:
+        print("Today is the weekend, and there will be no updated stock")
+        return 0
 
     link = 'https://api.tdameritrade.com/v1/marketdata/%s/quotes' % ticker
     history_link = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
