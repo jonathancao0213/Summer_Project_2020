@@ -13,7 +13,7 @@ from calculate_trend import first_derivative, second_derivative
 # No longer needed but just kept for future reference
 """
 def keyboardInterruptHandler(signal, frame):
-    print("KeyboardInterrupt (ID: {}) has been caught. Stopping stock watch...".format(signal))
+    print("KeyboardInterrupt (ID: {}) has been caught. Stopping news watch...".format(signal))
     exit(0)
 
 signal.signal(signal.SIGINT, keyboardInterruptHandler)

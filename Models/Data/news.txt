@@ -1,18 +1,3 @@
-3|S&P Futures has increased by 0.06% or 2.00 points to 3,120.50 points
-3|Dow Futures has increased by 0.12% or 31.00 points to 26,051.00 points
-3|Nasdaq Futures has increased by 0.26% or 26.25 points to 10,222.25 points
-3|Russell 2000 Futures has increased by 0.17% or 2.50 points to 1,436.70 points
-1|Crude Oil has decreased by -0.02% or -0.01 points to 40.36 points
-3|Gold has increased by 0.11% or 2.00 points to 1,784.00 points
-1|Silver has decreased by -0.04% or -0.01 points to 18.06 points
-3|EUR/USD has increased by 0.09% or 0.0010 points to 1.1324 points
-2|10-Yr Bond is unchanged at 0.7090
-1|Vix has decreased by -1.26% or -0.40 points to 31.37 points
-1|GBP/USD has decreased by -0.01% or -0.0001 points to 1.2513 points
-3|USD/JPY has increased by 0.08% or 0.0840 points to 106.5740 points
-3|CMC Crypto 200 has increased by 1.12% or 2.18 points to 197.97 points
-3|FTSE 100 has increased by 1.21% or 75.50 points to 6,320.12 points
-1|Nikkei 225 has decreased by -0.07% or -14.73 points to 22,534.32 points
 2|The U.S. housing market will be in focus again Wednesday when KB Home reports quarterly earnings and weekly mortgage applications data is released.
 3|Amazon launched a $2 billion venture capital fund Tuesday to invest in technologies and services aimed at reducing greenhouse gas emissions. Speaking to Yahoo Finance, Amazon’s Head of Worldwide Sustainability Kara Hurst said the move was yet another step to use the e-commerce giant’s 'scale for good' as it sets aggressive targets to become carbon neutral by 2040.  
 3|With the addition of sleep tracking, the Apple Watch is now easily the best smartwatch money can buy.
@@ -38,3 +23,30 @@
 3|Amazon Chief Sustainability Officer Kara Hurst joins Yahoo Finance’s Akiko Fujita to discuss Amazon’s move to launch a $2 billion venture capital fund to invest in clean energy.
 3|Yahoo Finance’s Emily McCormick joins Akiko Fujita to break down Cowen raising its price target on Peloton as the analyst calls the workout equipment company "uniquely well positioned."
 3|Yahoo Finance’s Sibile Marcellus joins Akiko Fujita to discuss how tech companies like Amazon are responding to President Trump’s order to pause entry to certain foreign workers.
+|The automaker unveiled the all new version of America’s top selling vehicle at an online event on Thursday night, claiming the new all F-150 is targeting the most “towing, payload, torque and horsepower of any light-duty full-size pickup,” all the while providing a completely new interior and technology package, updated exterior styling, and productivity tools like an integrated power generator, and tailgate that doubles as a workbench. 
+|Angel Onuoha, CEO and Founder of BLK Capital Management, joins Yahoo Finance to discuss his firm's investment strategy and how it is helping create a talent pipeline for black students to enter finance.
+|A group of 100 businesses is boycotting advertising with Facebook in the month of July. One of the organizers, the ADL, spoke to Yahoo Finance about why and what the group is after.
+|Stock futures kicked off the overnight session slightly lower following an afternoon rally on Wall Street.
+|Keenan Beasley, President of Venture Noire, joins Yahoo Finance to discuss the barriers to entry for under represented founders in gaining capital.
+|LA Clippers Chairman Steve Ballmer joins 'Influencers with Andy Serwer' to weigh in on the return of the NBA season.
+|Richard Kerby, Equal Ventures Partner, joins The Final Round to discuss his finding on racial inequality in investment firms and how firms can grow in the future to include more voices.
+|Nike swung to a quarterly loss and posted fiscal fourth-quarter sales that dropped more than expected, as a slew of global store closures hit the athletic-wear maker’s results.
+|Brian Belski, Chief Investment Strategist at BMO Capital, joins The Final Round to discuss the day's market action and the primary factors driving recent volatility.
+|Yahoo Finance's Rick Newman joined The Final Round to discuss the latest news of out the Government Accountability Office that the IRS sent stimulus checks to over 1 million dead people.
+|George Seay, Annandale Capital CEO, joined The Final Round to discuss his outlook for the market as states slowly begin to reopen.
+|The markets closed in the green after Thursday’s trading session amid worries of escalating coronavirus cases. The financial sector was the big winner after regulators eased the Volcker rule on big banks. The Final Round panel discusses the latest.
+|Nike reported fiscal 4Q results after market close Thursday.
+|Dr. Robyn Gershon, NYU School of Global Public Health, joins The Final Round to discuss the resurgence of coronavirus cases and how states should be handling the threat of more cases and more hospitalizations.
+|The Fed will bar big banks from increasing their dividend payments, following the central bank’s annual stress tests that included a “sensitivity” analysis incorporating the impact of the COVID-19 crisis.
+|As coronavirus cases continue to surge in the U.S., Disney announced that it would not reopen Disneyland in California as scheduled, citing a lack of guidance from officials. Meanwhile, the entertainment giant is reportedly weighing the July 24 release date of ‘Mulan’ due to theater closures. The Final Round panel discusses the continued impact of coronavirus on Disney and the entertainment industry.
+|Chris Konstantinos, RiverFront Investment Group's Chief Investment Strategist, joined The Final Round to give his take on the markets and his outlook for second quarter earnings.
+|Stocks wavered between gains and losses Thursday after Texas said it was pausing its reopening process due to a renewed surge in Covid-19 infections in the state. Investors also monitored incoming economic data, with a new report showing stubbornly high levels of new unemployment claims.
+|Beyond Meat’s shares fell on Thursday after McDonald’s acknowledged the end of its meatless burger trial in Canada. McDonald’s Corporation Yahoo Finance’s Heidi Chung joins The Final Round to break down the recent news surrounding McDonald’s and Beyond meat.
+|On Thursday, shares of Spotify outperformed the broader market after getting a price target boost from Goldman Sachs, which raised its 12-month objective from $205 to $280. The firm thinks Spotify’s recent moves will pay off in the form of an increased global podcast audience, and an advancement of the development of Spotify’s audio advertising technology platform. The Final Round panel discusses the bullish call.
+|Renaissance IPO ETF Manager Kathleen Smith joins Yahoo Finance's Akiko Fujita to discuss the latest IPO market expectations amid the coronavirus.
+|Yahoo Finance’s Sibile Marcellus joins Akiko Fujita to discuss the latest outlook for Darden Restaurants.
+|The parent company of Chuck E. Cheese has filed for Chapter 11 bankruptcy. Yahoo Finance’s Sibile Marcellus joins Akiko Fujita to share the details.
+|Texas Governor Abbott announced on Thursday that he would be pausing all plans to reopen the state as coronavirus cases and hospitalizations continue to rise in state. Yahoo Finance’s Anjalee Khemlani breaks down the latest news about the coronavirus on The Final Round.
+|Nikkei 225 has increased by 0.94% or 209.39 points to 22,469.18 points
+|As the COVID-19 crisis continues to take its toll on the U.S. economy, economists are expecting that consumption is rebounding but income falls further.
+|Nike's (NKE) disappointing fourth-quarter results reflected the harsh COVID-19 reality facing most retail brands. However, the fundamentals of the Swoosh brand remain strong, with the company hanging its hat on numerous bright spots centered around its digital platforms. 
