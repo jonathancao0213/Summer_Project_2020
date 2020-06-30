@@ -2,8 +2,11 @@ import sys, ast, csv
 from add_today import add_day
 from timeloop import Timeloop
 import time
+import numpy as np
 from datetime import timedelta
+from datetime import datetime
 from newscrawl import get_news_for, check_if_news_exists
+
 
 """
 with open('stock_watch.csv', newline = '') as e:
@@ -18,7 +21,7 @@ tickerlist = tickerlist[1:]
 apikey = None
 tl = Timeloop()
 
-@tl.job(interval=timedelta(days=1))
+@tl.job(interval=timedelta(hours=5))
 def update_stock():
     if datetime.today().weekday() == 5 or datetime.today().weekday() == 6:
         print("Today is the weekend, and there will be no updated stock")
@@ -28,11 +31,14 @@ def update_stock():
             data = list(reader)
         for company in data:
             add_day(apikey, company[0])
-        print("Finished adding today's data to databases")
+        print("Finished adding today's data to databases\n")
 
-@tl.job(interval=timedelta(hours=8))
+news_time = 6 + np.random.randn()
+@tl.job(interval=timedelta(hours=news_time))
 def update_news():
+    print("Scraping the news in the past %d hours" % news_time)
     get_news_for()
+    print("Finished adding last %d hours news to database\n" % news_time)
 
 if __name__ == "__main__":
     apikey = sys.argv[1]

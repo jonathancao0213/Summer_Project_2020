@@ -15,8 +15,9 @@ import signal
 
 def get_news_for(source=None):
     # First from bloomberg.com
+
     url = "https://finance.yahoo.com/news/"
-    print("Scraping from %s" % url)
+
 
     client = urlopen(url)
     html = client.read()
@@ -46,19 +47,60 @@ def get_news_for(source=None):
     for n in news:
         line = n.get_text().replace('\n', '')
         first_sentence = line.split('.')[0]
-        if check_if_news_exists(first_sentence, data) == False:
+        if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line:
             print(line)
-            if "increase" in line or "higher" in line or "gain" in line or "rise" in line or "outperform" in line:
-                file.write('3|'+ line + '\n')
-            elif "decrease" in line or "lower" in line or "loss" in line or "drop" in line or "fell" in line or "underperform" in line or "bankruptcy" in line:
+            bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
+            good = ["increase", "higher", "gain", "rise", "outperform"]
+
+            if any(b in line for b in bad):
                 file.write('1|'+ line + '\n')
+            elif any(g in line for g in good):
+                file.write('3|'+ line + '\n')
             else:
-                file.write('|'+ line + '\n')
+                try:
+                    file.write('|'+ line + '\n')
+                except:
+                    print("\nThe following line could not be written:")
+                    print(line + '\n')
+    print("Finished scraping for " + url + '\n')
+
+#---------------------------------------------------------------------------------------------------
+
+    url = "https://finance.yahoo.com/topic/stock-market-news"
+
+    client = urlopen(url)
+    html = client.read()
+    client.close()
+
+    page = soup(html, "html.parser")
+
+    news = page.find_all("li", {"class":"js-stream-content"})
+    #news = page.find_all("p", {"class": "Fz(14px) Lh(19px) Fz(13px)--sm1024 Lh(17px)--sm1024 LineClamp(2,38px) LineClamp(2,34px)--sm1024 M(0) C(#959595)"})
+    for n in news:
+        summary = n.div.div.div.h3
+        try:
+            line = summary.get_text()
+            first_sentence = line.split('.')[0]
+            if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line:
+                print(line)
+                bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
+                good = ["increase", "higher", "gain", "rise", "outperform"]
+
+                if any(b in line for b in bad):
+                    file.write('1|'+ line + '\n')
+                elif any(g in line for g in good):
+                    file.write('3|'+ line + '\n')
+                else:
+                    file.write('|'+ line + '\n')
+        except:
+            pass
+
+    print("Finished scraping for " + url + '\n')
     file.close()
 
 def check_if_news_exists(first_sentence, data):
     for row in data:
-        if first_sentence in row.replace('|',''):
+        if first_sentence in row.split('|')[1]:
             return True
     return False
 
