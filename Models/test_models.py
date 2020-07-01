@@ -1,5 +1,10 @@
 import sys
 import numpy as np
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+import torch.optim as optim
+
 # All metrics defined in here
 import metrics
 # Decision Tree and Prior Probability (hw 1)
@@ -10,10 +15,12 @@ from knn import KNearestNeighbor
 # K Means and GMM clustering (hw 5)
 from kmeans import KMeans
 from gmm import GMM
-#regression
+# Regression
 from linear_regression import LinearRegression
-#GD
+# GD
 from gradient_descent import GradientDescent
+# Neural network
+from neural_network import Stock_Classifier, run_model
 
 data = sys.argv[1]
 
@@ -162,7 +169,27 @@ elif model == "reinforcement":
     raise NotImplementError()
 
 elif model == "neural_network":
-    raise NotImplementError()
+    train_dataset = metrics.MyDataset(trainf, traint)
+    valid_dataset = metrics.MyDataset(testf, testt)
+
+    model = Stock_Classifier() # Change this line to Stock_Classifier
+    _m, _est_loss, _est_acc = run_model(model,running_mode='train', train_set=train_dataset,valid_set = valid_dataset, batch_size=1, learning_rate=1e-3, n_epochs=5, shuffle=False)
+
+    # train_loader = DataLoader(train_dataset)
+    # for i, (inputs, targets) in enumerate(train_loader):
+    #     outputs = Basic_Model(inputs)
+    #     targets = targets.long()
+    #     print([outputs, targets])
+
+    _est_loss_train = np.mean(_est_loss['train'])
+    _est_loss_valid = np.mean(_est_loss['valid'])
+
+    _est_acc_train = np.mean(_est_acc['train'])
+    _est_acc_valid = np.mean(_est_acc['valid'])
+
+    _est_values = np.array([_est_loss_train, _est_loss_valid, _est_acc_train, _est_acc_valid])
+
+    print(_est_values)
 
 else:
-    raise NotImplementError()
+    print("Enter valid model")

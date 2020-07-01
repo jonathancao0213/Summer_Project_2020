@@ -17,7 +17,7 @@ def get_news_for(source=None):
     # First from bloomberg.com
 
     url = "https://finance.yahoo.com/news/"
-
+    print("Scraping: " + url)
 
     client = urlopen(url)
     html = client.read()
@@ -67,6 +67,7 @@ def get_news_for(source=None):
 #---------------------------------------------------------------------------------------------------
 
     url = "https://finance.yahoo.com/topic/stock-market-news"
+    print("Scraping: " + url)
 
     client = urlopen(url)
     html = client.read()
@@ -77,7 +78,7 @@ def get_news_for(source=None):
     news = page.find_all("li", {"class":"js-stream-content"})
     #news = page.find_all("p", {"class": "Fz(14px) Lh(19px) Fz(13px)--sm1024 Lh(17px)--sm1024 LineClamp(2,38px) LineClamp(2,34px)--sm1024 M(0) C(#959595)"})
     for n in news:
-        summary = n.div.div.div.h3
+        summary = n.find("h3")
         try:
             line = summary.get_text()
             first_sentence = line.split('.')[0]
@@ -93,7 +94,8 @@ def get_news_for(source=None):
                 else:
                     file.write('|'+ line + '\n')
         except:
-            pass
+            print("Line could not be foudn")
+
 
     print("Finished scraping for " + url + '\n')
     file.close()
