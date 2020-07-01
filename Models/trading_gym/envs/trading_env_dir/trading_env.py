@@ -5,7 +5,6 @@ from gym.utils import seeding
 
 class TradingEnv(gym.Env):
     def __init__(self, data):
-        super(Agent, self).__init__()
 
         self.data = data
         self.current_day = 0
@@ -17,10 +16,10 @@ class TradingEnv(gym.Env):
         self.number_of_stocks = 0
 
         #Three actions: buy, sell, or nothing
-        self.action_space = space.Discrete(3)
+        self.action_space = spaces.Discrete(3)
 
         #change shape to the data
-        self.observation_space = space.Box(low = 0, high = 1, shape = (6,6), dtype = np.float16)
+        self.observation_space = spaces.Box(low = 0, high = 1, shape = (6,6), dtype = np.float16)
 
     def _next_day(self):
         next_day_data = data[self.current_day+1,:]
@@ -34,9 +33,11 @@ class TradingEnv(gym.Env):
         #if buy stock
         elif action == 1:
             #subtract balance and by the day close and
+            #uses data
             self.balance -= data[self.current_day, 1]
             self.number_of_stocks += 1
         #if sell stock
+        #uses data
         elif action == 2:
             self.balance += data[self.current_day, 1]*self.number_of_stocks
             self.number_of_stocks = 0
@@ -47,8 +48,9 @@ class TradingEnv(gym.Env):
 
         self.current_day += 1
 
+        #uses data
         reward = (self.balance + self.number_of_stocks*data[self.current_day,1])  * (self.current_day/365)
-
+        #uses data
         done = (self.balance + self.number_of_stocks*data[self.current_day,1]) <= 0
 
         observations = self._next_day()
@@ -60,4 +62,4 @@ class TradingEnv(gym.Env):
         self.number_of_stocks = 0
         self.current_day = 0
 
-    return self._next_day()
+        return self._next_day()
