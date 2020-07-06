@@ -1,7 +1,6 @@
 import bs4
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
-from lxml import etree
 import csv
 import sys
 import requests
@@ -47,7 +46,7 @@ def get_news_for(source=None):
     for n in news:
         line = n.get_text().replace('\n', '')
         first_sentence = line.split('.')[0]
-        if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line:
+        if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line and "Yahoo Finance's" not in line:
             print(line)
             bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
             good = ["increase", "higher", "gain", "rise", "outperform"]
@@ -65,7 +64,7 @@ def get_news_for(source=None):
     print("Finished scraping for " + url + '\n')
 
 #---------------------------------------------------------------------------------------------------
-
+# stock market news
     url = "https://finance.yahoo.com/topic/stock-market-news"
     print("Scraping: " + url)
 
@@ -82,7 +81,7 @@ def get_news_for(source=None):
         try:
             line = summary.get_text()
             first_sentence = line.split('.')[0]
-            if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line:
+            if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line and "Yahoo Finance's" not in line:
                 print(line)
                 bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
                 good = ["increase", "higher", "gain", "rise", "outperform"]
@@ -98,6 +97,32 @@ def get_news_for(source=None):
 
 
     print("Finished scraping for " + url + '\n')
+
+#---------------------------------------------------------------------------------------------------
+# forbes
+    forbes = "https://www.forbes.com/news/"
+    print("Scraping " + forbes)
+
+    r = requests.get(forbes)
+    con = r.content
+    forbes_page = soup(con, "html.parser")
+    l = forbes_page.find_all("article")
+    for each in l:
+        line = each.find("h2").get_text()
+        line = line + ' ' +  each.find("div", {"class":"stream-item__description"}).get_text()
+        if check_if_news_exists(line, data) == False:
+            line.replace('\n','')
+            print(line)
+            val = check_news_eval(line)
+            if val == 1:
+                file.write('1|' + line + '\n')
+            elif val == 2:
+                file.write('3|' + line + '\n')
+            else:
+                file.write('|' + line + '\n')
+
+    print("Finished scraping " + forbes)
+
     file.close()
 
 def check_if_news_exists(first_sentence, data):
@@ -105,6 +130,16 @@ def check_if_news_exists(first_sentence, data):
         if first_sentence in row.split('|')[1]:
             return True
     return False
+
+def check_news_eval(line):
+    bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
+    good = ["increase", "higher", "gain", "rise", "outperform"]
+    if any(b in line for b in bad):
+        return 1
+    elif any(g in line for g in good):
+        return 2
+    else:
+        return 3
 
 if __name__ == "__main__":
     get_news_for()
