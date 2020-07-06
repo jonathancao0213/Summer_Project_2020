@@ -5,6 +5,7 @@ import csv
 import sys
 import requests
 import signal
+import textdistance
 
 # def keyboardInterruptHandler(signal, frame):
 #     print("KeyboardInterrupt (ID: {}) has been caught. Stopping news watch...".format(signal))
@@ -46,15 +47,13 @@ def get_news_for(source=None):
     for n in news:
         line = n.get_text().replace('\n', '')
         first_sentence = line.split('.')[0]
-        if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line and "Yahoo Finance's" not in line:
+        if check_if_news_exists(first_sentence, data) == False and ("Final Round" not in line) and ("Akiko Fujita" not in line) and ("Yahoo Finance" not in line):
             print(line)
-            bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
-            good = ["increase", "higher", "gain", "rise", "outperform"]
-
-            if any(b in line for b in bad):
-                file.write('1|'+ line + '\n')
-            elif any(g in line for g in good):
-                file.write('3|'+ line + '\n')
+            val = check_news_eval(line)
+            if val == 1:
+                file.write('1|' + line + '\n')
+            elif val == 2:
+                file.write('3|' + line + '\n')
             else:
                 try:
                     file.write('|'+ line + '\n')
@@ -81,17 +80,15 @@ def get_news_for(source=None):
         try:
             line = summary.get_text()
             first_sentence = line.split('.')[0]
-            if check_if_news_exists(first_sentence, data) == False and "Final Round" not in line and "Akiko Fujita" not in line and "Yahoo Finance's" not in line:
+            if check_if_news_exists(first_sentence, data) == False and ("Final Round" not in line) and ("Akiko Fujita" not in line) and ("Yahoo Finance" not in line):
                 print(line)
-                bad = ["decrease", "lower", "sank", "loss", "drop", "fell", "underperform", "bankruptcy"]
-                good = ["increase", "higher", "gain", "rise", "outperform"]
-
-                if any(b in line for b in bad):
-                    file.write('1|'+ line + '\n')
-                elif any(g in line for g in good):
-                    file.write('3|'+ line + '\n')
+                val = check_news_eval(line)
+                if val == 1:
+                    file.write('1|' + line + '\n')
+                elif val == 2:
+                    file.write('3|' + line + '\n')
                 else:
-                    file.write('|'+ line + '\n')
+                    file.write('|' + line + '\n')
         except:
             print("Line could not be foudn")
 
@@ -127,7 +124,7 @@ def get_news_for(source=None):
 
 def check_if_news_exists(first_sentence, data):
     for row in data:
-        if first_sentence in row.split('|')[1]:
+        if textdistance.jaro.similarity(first_sentence,row.split('|')[1]) >= 0.75:
             return True
     return False
 
