@@ -104,7 +104,6 @@ class DecisionTree():
             for index in range(0, len(attributes) - 1):
                 info = information_gain(features, index, targets)
                 if info > max:
-                    print(info)
                     max = info
                     i = index
 

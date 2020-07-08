@@ -13,7 +13,7 @@ import textdistance
 #
 # signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
-def get_news_for(source=None):
+def get_news():
     # First from bloomberg.com
 
     url = "https://finance.yahoo.com/news/"
@@ -122,6 +122,28 @@ def get_news_for(source=None):
 
     file.close()
 
+def get_news_for(source):
+    print("Getting news for %s" % source)
+    str = source.split(' ')
+    s = str[0]
+    for i, each in enumerate(str):
+        if i == 0:
+            continue
+        s = s + '+' + each
+    url = "https://www.google.com/search?q=%s&tbm=nws" % s
+    r = requests.get(url)
+    con = r.content
+    page = soup(con, "html.parser")
+
+    file = open("Data/")
+
+    a = page.find_all("div", {"class":"BNeawe vvjwJb AP7Wnd"})
+    for each in a:
+        line = each.get_text()
+        if check_if_news_exists(line, data) == False:
+            line.replace('\n','')
+            print(line)
+
 def check_if_news_exists(first_sentence, data):
     for row in data:
         if textdistance.jaro.similarity(first_sentence,row.split('|')[1]) >= 0.75:
@@ -139,4 +161,7 @@ def check_news_eval(line):
         return 3
 
 if __name__ == "__main__":
-    get_news_for()
+    try:
+        get_news_for(sys.argv[1])
+    except:
+        get_news()

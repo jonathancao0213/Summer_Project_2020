@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import torch.optim as optim
+from math import ceil
 
 # All metrics defined in here
 import metrics
@@ -25,20 +26,25 @@ from neural_network import Stock_Classifier, run_model
 data = sys.argv[1]
 
 features, targets, attribute_names = metrics.load_data("Data/" + data)
-today = features[-1,:]
+today = features[-3:-1,:]
 
 model = sys.argv[2]
 
 fraction = (float)(sys.argv[3])
 
 trainf, traint, testf, testt = metrics.train_test_split(features, targets, fraction)
+btrainf = np.ceil(np.asarray(trainf))
+btestf = np.ceil(np.asarray(testf))
+
+# btrainf = btrainf.tolist()
+# btestf = btestf.tolist()
+
 
 if model == "decision_tree":
     tree = DecisionTree(attribute_names)
-    tree.fit(trainf, traint)
+    tree.fit(btrainf, traint)
     num_nodes, max_depth = tree.tree_attributes(tree.tree)
-    t = tree.predict(testf)
-    print(t)
+    t = tree.predict(btestf)
     decision = tree.predict(today)
     #print(decision)
     #print("Should you buy tomorrow with today's data? %d" % decision)
@@ -49,29 +55,32 @@ if model == "decision_tree":
     print("Accuracy = %f\n" % a)
     print("Precision = %f, Recall = %f\n" % (p,r))
     print("F1 measure = %f\n" % f)
+    print("Tomorrow's Forecast: %f\n" % decision[-1])
 
 elif model == "prior_probability":
     prob = PriorProbability()
-    prob.fit(trainf, traint)
-    t = prob.predict(testf)
-    print(t)
+    prob.fit(btrainf, traint)
+    t = prob.predict(btestf)
     decision = prob.predict(today)
-    print(decision)
     #raise ValueError(t)
     cm = metrics.confusion_matrix(testt, t)
     a = metrics.accuracy(testt, t)
     p, r = metrics.precision_and_recall(testt, t)
-    f = metrics.f1_measure(testt, t)
+    try:
+        f = metrics.f1_measure(testt, t)
+    except:
+        f = 0
     print("Accuracy = %f\n" % a)
     print("Precision = %f, Recall = %f\n" % (p,r))
     print("F1 measure = %f\n" % f)
+    print("Tomorrow's Forecast: %f\n" % decision[-1])
+
 
 elif model == "knn":
     knn = KNearestNeighbor(10, distance_measure='euclidean', aggregator='mean')
     knn.fit(trainf, traint)
 
     labels = knn.predict(testf)
-    print(labels)
     binary_labels = []
     for each in labels:
         if each > 0.5:
