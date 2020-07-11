@@ -10,11 +10,11 @@ torch.set_default_dtype(torch.float64)
 class Stock_Classifier(nn.Module):
     def __init__(self):
         super(Stock_Classifier, self).__init__()
-        self.fc1 = nn.Linear(8, 100)
-        self.fc2 = nn.Linear(100,50)
-        self.fc3 = nn.Linear(50,25)
-        self.fc4 = nn.Linear(25, 10)
-        self.fc5 = nn.Linear(10,2)
+        self.fc1 = nn.Linear(8, 24)
+        self.fc2 = nn.Linear(24,16)
+        self.fc3 = nn.Linear(16,8)
+        self.fc4 = nn.Linear(8, 4)
+        self.fc5 = nn.Linear(4,2)
 
     def forward(self, input):
         x = F.relu(self.fc1(input))

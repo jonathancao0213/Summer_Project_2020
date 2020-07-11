@@ -31,7 +31,7 @@ def pair_ticker(ticker, name):
     file = open("Data/pair_ticker.csv", mode='a', newline='')
     writer = csv.writer(file, delimiter=',')
     name = name.split(" - ")
-    writer.writerow([ticker, name[0]])
+    writer.writerow([ticker, name[0].replace(" Common Stock", "").replace(", ", ""),replace("Inc","")])
 
 def create_database(apikey, ticker, replace=False):
     """

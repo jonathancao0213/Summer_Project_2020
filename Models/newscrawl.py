@@ -6,6 +6,8 @@ import sys
 import requests
 import signal
 import textdistance
+import datetime
+from datetime import datetime
 
 # def keyboardInterruptHandler(signal, frame):
 #     print("KeyboardInterrupt (ID: {}) has been caught. Stopping news watch...".format(signal))
@@ -107,6 +109,8 @@ def get_news():
     for each in l:
         line = each.find("h2").get_text()
         line = line + ' ' +  each.find("div", {"class":"stream-item__description"}).get_text()
+        if line == '':
+            continue
         if check_if_news_exists(line, data) == False:
             line.replace('\n','')
             print(line)
@@ -161,6 +165,7 @@ def check_news_eval(line):
         return 3
 
 if __name__ == "__main__":
+    print(datetime.now())
     try:
         get_news_for(sys.argv[1])
     except:
