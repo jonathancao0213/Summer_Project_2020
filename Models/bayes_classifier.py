@@ -35,7 +35,7 @@ def f_score(actual, predict):
         elif predict[i] == '3' and actual[i] == '3':
             pos_pos += 1
         else:
-            print("The actual rating of %d is %s when it should be %s" % (i, predict[i], actual[i]))
+            pass
 
     precision = float(pos_pos)/float(pos_pos + neg_pos + neu_pos)
     recall = float(pos_pos)/float(pos_pos + pos_neu + pos_neg)
@@ -126,7 +126,6 @@ class Bayes_Classifier:
 
             fields = line.split('|')
             rating = fields[0]
-            actual.append(rating)
             text = fields[1].split(' ')
             for word in text:
                 word = word.lower()
@@ -178,7 +177,9 @@ class Bayes_Classifier:
                         predict.append('1')
                     else:
                         predict.append('2')
-                except:
-                    print(self.numpositive, self.numnegative, self.numneutral, i)
 
+                    actual.append(rating)
+                except:
+                    pass
+                    #print(self.numpositive, self.numnegative, self.numneutral, i)
         return actual, predict
