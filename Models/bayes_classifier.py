@@ -125,8 +125,13 @@ class Bayes_Classifier:
                 line = line.replace(each, '')
 
             fields = line.split('|')
-            rating = fields[0]
-            text = fields[1].split(' ')
+            try:
+                rating = fields[0]
+                text = fields[1].split(' ')
+            except:
+                text = fields[0]
+                rating = 0
+                
             for word in text:
                 word = word.lower()
 
@@ -180,6 +185,7 @@ class Bayes_Classifier:
 
                     actual.append(rating)
                 except:
+                    print(word)
                     pass
                     #print(self.numpositive, self.numnegative, self.numneutral, i)
         return actual, predict

@@ -8,6 +8,7 @@ import signal
 import textdistance
 import datetime
 from datetime import datetime
+import linecache
 
 # def keyboardInterruptHandler(signal, frame):
 #     print("KeyboardInterrupt (ID: {}) has been caught. Stopping news watch...".format(signal))
@@ -109,7 +110,7 @@ def get_news():
     for each in l:
         line = each.find("h2").get_text()
         line = line + ' ' +  each.find("div", {"class":"stream-item__description"}).get_text()
-        if line == '':
+        if line == '' or line == '\n':
             continue
         if check_if_news_exists(line, data) == False:
             line.replace('\n','')
@@ -139,14 +140,21 @@ def get_news_for(source):
     con = r.content
     page = soup(con, "html.parser")
 
-    file = open("Data/")
+    file = open("Data/news.txt")
+    data = list(file)
+
+    ret = []
+
+    print("Opening up %s" % source)
 
     a = page.find_all("div", {"class":"BNeawe vvjwJb AP7Wnd"})
     for each in a:
         line = each.get_text()
         if check_if_news_exists(line, data) == False:
             line.replace('\n','')
-            print(line)
+            ret.append(line)
+
+    return ret
 
 def check_if_news_exists(first_sentence, data):
     for row in data:
@@ -164,9 +172,25 @@ def check_news_eval(line):
     else:
         return 3
 
+def PrintException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
+
+
 if __name__ == "__main__":
     print(datetime.now())
     try:
         get_news_for(sys.argv[1])
+        print("Finished getting news for %s" % sys.argv[1])
     except:
-        get_news()
+        print("Check data file for empty lines")
+        PrintException()
+        try:
+            get_news()
+        except:
+            PrintException()
