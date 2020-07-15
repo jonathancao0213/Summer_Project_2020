@@ -37,16 +37,16 @@ def f_score(actual, predict):
         else:
             pass
 
-    precision = float(pos_pos)/float(pos_pos + neg_pos + neu_pos)
-    recall = float(pos_pos)/float(pos_pos + pos_neu + pos_neg)
+    precision = float(pos_pos + 1)/float(pos_pos + neg_pos + neu_pos + 1)
+    recall = float(pos_pos + 1)/float(pos_pos + pos_neu + pos_neg + 1)
     f_score_pos = float(2.0)*precision*recall/(precision+recall)
 
-    precision = float(neu_neu)/float(pos_neu + neg_neu + neu_neu)
-    recall = float(neu_neu)/float(neu_pos + neu_neu + neu_neg)
+    precision = float(neu_neu + 1)/float(pos_neu + neg_neu + neu_neu + 1)
+    recall = float(neu_neu + 1)/float(neu_pos + neu_neu + neu_neg + 1)
     f_score_neu = float(2.0)*precision*recall/(precision+recall)
 
-    precision = float(neg_neg)/float(pos_neg + neg_neg + neu_neg)
-    recall = float(neg_neg)/float(neg_pos + neg_neu + neg_neg)
+    precision = float(neg_neg + 1)/float(pos_neg + neg_neg + neu_neg + 1)
+    recall = float(neg_neg + 1)/float(neg_pos + neg_neu + neg_neg + 1)
     f_score_neg = float(2.0)*precision*recall/(precision+recall)
 
     return f_score_pos, f_score_neg, f_score_neu
@@ -131,7 +131,7 @@ class Bayes_Classifier:
             except:
                 text = fields[0]
                 rating = 0
-                
+
             for word in text:
                 word = word.lower()
 

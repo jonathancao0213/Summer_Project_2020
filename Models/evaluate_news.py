@@ -12,10 +12,15 @@ def load_data(d):
     data = f.readlines()
     f.close()
 
-def bayes(d, amount=None):
+def bayes(d, amount):
     global classifier
-    classifier.train(d[:599])
-    actual, predictions = classifier.classify(d[:599])
+    if amount != 0:
+        classifier.train(d[:amount])
+        actual, predictions = classifier.classify(d[:amount])
+    else:
+        classifier.train(d)
+        actual, predictions = classifier.classify(d)
+
     fpos, fneg, fneu = f_score(actual, predictions)
     return fpos, fneg, fneu
 
@@ -37,11 +42,12 @@ if __name__ == "__main__":
     # company name = sys.argv[3]
 
     load_data(sys.argv[1])
-    try:
-        amount = sys.argv[2]
-        fpos, fneg, fneu = bayes(data, amount)
-    except:
-        fpos, fneg, fneu = bayes(data)
+    amount = sys.argv[2]
+    if amount != "":
+        fpos, fneg, fneu = bayes(data, int(amount))
+    else:
+        print("Using all the data")
+        fpos, fneg, fneu = bayes(data, 0)
 
     print("Positive Fscore = %f, Negative Fscore = %f, Neutral Fscore = %f" % (fpos, fneg, fneu))
 
