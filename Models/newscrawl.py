@@ -17,7 +17,8 @@ import linecache
 # signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
 def get_news():
-    # First from bloomberg.com
+
+    ret = []
 
     url = "https://finance.yahoo.com/news/"
     print("Scraping: " + url)
@@ -28,41 +29,10 @@ def get_news():
 
     page = soup(html, "html.parser")
 
-    read_file = open("Data/news.txt", mode='r')
-    data = list(read_file)
-    file = open("Data/news.txt", mode='a', newline='')
-
-    #print(page.find_all("li", attrs={"class": "js-stream-content Pos(r)"}))
-
-    # news = page.find_all("li")
-    # for n in news:
-    #     if n.has_attr("data-reactid"):
-    #         if n.has_attr("aria-label"):
-    #             dat = '|' + n.a["aria-label"]
-    #         else:
-    #             continue
-    #
-    #     first_sentence = dat.split('.')[0]
-    #     if check_if_news_exists(first_sentence, data) == False:
-    #         file.write(dat + '\n')
-
     news = page.find_all("p", {"class":"Fz(14px) Lh(19px) Fz(13px)--sm1024 Lh(17px)--sm1024 LineClamp(2,38px) LineClamp(2,34px)--sm1024 M(0)"})#[0].get_text())
     for n in news:
         line = n.get_text().replace('\n', '')
-        first_sentence = line.split('.')[0]
-        if check_if_news_exists(first_sentence, data) == False and ("Final Round" not in line) and ("Akiko Fujita" not in line) and ("Yahoo Finance" not in line):
-            print(line)
-            val = check_news_eval(line)
-            if val == 1:
-                file.write('1|' + line + '\n')
-            elif val == 2:
-                file.write('3|' + line + '\n')
-            else:
-                try:
-                    file.write('|'+ line + '\n')
-                except:
-                    print("\nThe following line could not be written:")
-                    print(line + '\n')
+        ret.append(line)
     print("Finished scraping for " + url + '\n')
 
 #---------------------------------------------------------------------------------------------------
@@ -82,20 +52,9 @@ def get_news():
         summary = n.find("h3")
         try:
             line = summary.get_text()
-            first_sentence = line.split('.')[0]
-            if check_if_news_exists(first_sentence, data) == False and ("Final Round" not in line) and ("Akiko Fujita" not in line) and ("Yahoo Finance" not in line):
-                print(line)
-                val = check_news_eval(line)
-                if val == 1:
-                    file.write('1|' + line + '\n')
-                elif val == 2:
-                    file.write('3|' + line + '\n')
-                else:
-                    file.write('|' + line + '\n')
+            ret.append(line)
         except:
-            print("Line could not be foudn")
-
-
+            print("Line could not be found")
     print("Finished scraping for " + url + '\n')
 
 #---------------------------------------------------------------------------------------------------
@@ -112,20 +71,21 @@ def get_news():
         line = line + ' ' +  each.find("div", {"class":"stream-item__description"}).get_text()
         if line == '' or line == '\n':
             continue
-        if check_if_news_exists(line, data) == False:
-            line.replace('\n','')
-            print(line)
-            val = check_news_eval(line)
-            if val == 1:
-                file.write('1|' + line + '\n')
-            elif val == 2:
-                file.write('3|' + line + '\n')
-            else:
-                file.write('|' + line + '\n')
-
+        ret.append(line)
     print("Finished scraping " + forbes)
 
-    file.close()
+    return ret
+
+def add_news(news):
+    with open("Data/news.txt", mode='r',errors='ignore') as read_file:
+        data = list(read_file)
+    with open("Data/news.txt", mode='a', newline='', errors='ignore') as file:
+        for line in news:
+            if check_if_news_exists(line, data) == False and remove_yahoo_finance(line) == False:
+                print(line)
+                file.write('|' + line + '\n')
+
+    remove_empty_lines("Data/news.txt")
 
 def get_news_for(source):
     print("Getting news for %s" % source)
@@ -181,16 +141,40 @@ def PrintException():
     line = linecache.getline(filename, lineno, f.f_globals)
     print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
+def remove_empty_lines(file):
+    with open(file, mode='r') as f:
+        lines = f.readlines()
+
+    with open(file, mode='w') as f:
+        for line in lines:
+            if line == '\n' or len(line) == 0:
+                pass
+            else:
+                f.write(line)
+
+def remove_yahoo_finance(line):
+    words = ['Final Round', "Yahoo Finance's", "Akiko Fujita"]
+    if any(w in line for w in words):
+        return True
+    else:
+        return False
 
 if __name__ == "__main__":
     print(datetime.now())
     try:
-        get_news_for(sys.argv[1])
+        r = get_news_for(sys.argv[1])
+        print(r)
         print("Finished getting news for %s" % sys.argv[1])
+
     except:
         print("Check data file for empty lines")
         PrintException()
-        try:
-            get_news()
-        except:
-            PrintException()
+        r = get_news()
+        print("Adding news to Data/news.txt")
+        add_news(r)
+        with open("Data/pair_ticker.csv", mode='r') as file:
+            reader = csv.reader(file)
+            data = list(reader)
+        for company in data:
+            r = get_news_for(company[1])
+            add_news(r)

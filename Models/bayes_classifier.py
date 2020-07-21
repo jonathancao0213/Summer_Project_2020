@@ -96,8 +96,11 @@ class Bayes_Classifier:
                 self.numnegative += 1
             elif rating == '2':
                 self.numneutral += 1
-            else:
+            elif rating == '3':
                 self.numpositive += 1
+            else:
+                print("Invalid Rating")
+                raise
 
             for word in text:
                 rep = rating + word
