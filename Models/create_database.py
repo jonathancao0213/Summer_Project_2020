@@ -31,9 +31,9 @@ def pair_ticker(ticker, name):
     file = open("Data/pair_ticker.csv", mode='a', newline='')
     writer = csv.writer(file, delimiter=',')
     name = name.split(" - ")
-    writer.writerow([ticker, name[0].replace(" Common Stock", "").replace(", ", ""),replace("Inc","")])
+    writer.writerow([ticker, name[0].replace(" Common Stock", "").replace(", ", "").replace("Inc","")])
 
-def create_database(apikey, ticker, replace=False):
+def create_database(apikey, ticker, r=False):
     """
     This function creates a database that contains the past year's stock data for companies in tickerlist.
 
@@ -61,7 +61,7 @@ def create_database(apikey, ticker, replace=False):
     Otherwise we create the database.
     """
 
-    if path.exists('Data/%s_stock_normalized.csv' % ticker) and replace == False:
+    if path.exists('Data/%s_stock_normalized.csv' % ticker) and r == False:
         df = pd.read_csv('Data/%s_stock_normalized.csv' % ticker)
         if not df.empty:
             print("Database containing %s already exists, moving to next ticker." % ticker)
@@ -80,7 +80,7 @@ def create_database(apikey, ticker, replace=False):
     historylink = 'https://api.tdameritrade.com/v1/marketdata/%s/pricehistory' % ticker
 
     specs = {'apikey':apikey}
-    history_specs = {'apikey':apikey, 'period':1, 'periodType':'year', 'frequency':1, 'frequencyType':'daily'}
+    history_specs = {'apikey':apikey, 'period':20, 'periodType':'year', 'frequency':1, 'frequencyType':'daily'}
 
     overall = requests.get(url = link, params = specs)
     history = requests.get(url = historylink, params = history_specs)
@@ -198,4 +198,4 @@ def create_database(apikey, ticker, replace=False):
 
 
 if __name__ == "__main__":
-    create_database(sys.argv[1], sys.argv[2], replace=True)
+    create_database(sys.argv[1], sys.argv[2], r=True)

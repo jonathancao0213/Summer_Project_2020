@@ -1,6 +1,6 @@
 import sys, ast, csv
 from add_today import add_day
-from timeloop import Timeloop
+from create_database import create_database
 
 """
 with open('stock_watch.csv', newline = '') as e:
@@ -17,6 +17,7 @@ def ui(apikey):
         reader = csv.reader(file)
         data = list(reader)
     for company in data:
+        #create_database(apikey, company[0], True)
         add_day(apikey, company[0])
     print("Finished adding today's data to databases")
 

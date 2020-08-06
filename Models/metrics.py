@@ -17,6 +17,17 @@ class MyDataset(Dataset):
     def __len__(self):
         return self.x.shape[0]
 
+def make_binary(labels):
+    binary_labels = []
+    for each in labels:
+        if each >= 0.5:
+            binary_labels.append(1)
+        else:
+            binary_labels.append(0)
+
+    binary_labels = np.asarray(binary_labels)
+    return binary_labels
+
 def load_data(data_path):
     """
     Associated test case: tests/test_data.py
@@ -73,7 +84,10 @@ def load_data(data_path):
     attribute_names = attribute_names[3:]
 
     # Use list comprehension to remove the unwanted column in **usecol**
-    features = np.asarray(pd.read_csv(data_path, usecols=[i for i in cols if (i != 'Time') and (i != 'Buy') and (i != 'Day Open') and (i != 'Day Close') and (i != 'Volume')]))
+    #features = np.asarray(pd.read_csv(data_path, usecols=[i for i in cols if (i != 'Time') and (i != 'Buy') and (i != 'Day Open') and (i != 'Day Close')]))# and (i != 'Volume')]))
+    features = np.asarray(pd.read_csv(data_path,
+    usecols=[i for i in cols if (i != 'Time') and (i != 'Buy') and (i != 'Day Open') and (i != 'Day Close') and (i != "Normalized Open (52wk High/Low)") and (i != 'Volume')]))
+
     targets = np.asarray(pd.read_csv(data_path, usecols=['Buy']))
 
     features = features.astype(np.float)

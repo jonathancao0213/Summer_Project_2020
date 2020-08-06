@@ -31,7 +31,7 @@ def first_derivative(data):
     past_first_derivative = sum(derivatives)/len(derivatives)
     past_avg_normalized_open_to_close = sum(open_to_close)/len(open_to_close)
 
-    yesterday_close_to_today_open = (all[-3] - all[-2])/all[-3]
+    yesterday_close_to_today_open = -(all[-3] - all[-2])/all[-3]
 
     return yesterday_close_to_today_open, past_first_derivative, past_avg_normalized_open_to_close
 
